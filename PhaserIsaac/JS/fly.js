@@ -1,0 +1,51 @@
+import * as  map from './map.js'
+import * as  isaac from './isaac.js';
+
+export default class fly extends Phaser.Physics.Arcade.Sprite
+{
+	constructor(config) {
+		super(config.scene, config.x, config.y,'enemigoMosca');
+		config.scene.add.existing(this);
+		config.scene.physics.add.existing(this);
+		this.scene = config.scene;
+		this.x = config.x;
+		this.y = config.y;
+	}
+
+	create()
+	{
+		this.maxVida = 1;
+		this.vida = this.maxVida;
+		this.velocidad = 45;
+		this.createAnims();
+	}
+
+	createAnims()
+	{
+		this.scene.anims.create(
+			{
+				key: 'flyF',
+				frames: this.scene.anims.generateFrameNames('enemigoMosca', { start: 0, end: 3 }),
+				frameRate: 2,
+			});;
+    }
+
+	updateMoviemiento(isaac)
+	{
+		this.play('flyF', true);
+		
+		var direccion = new Phaser.Math.Vector2();
+
+		direccion.x = isaac.x - this.x;
+		direccion.y = isaac.y - this.y;
+
+		direccion.normalize();
+		var movimiento = new Phaser.Math.Vector2();
+
+		movimiento.x = direccion.x * this.velocidad;
+		movimiento.y = direccion.y * this.velocidad;
+
+		this.setVelocityX(movimiento.x);
+		this.setVelocityY(movimiento.y);
+	}
+}
