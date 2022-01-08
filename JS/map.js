@@ -2,7 +2,7 @@ import isaac from './isaac.js';
 import fly from './fly.js';
 import miniboss from './miniBoss.js';
 import * as teleport from './tp.js';
-
+import * as objetos from './objetos.js';
 
 
 export default class map extends Phaser.Scene
@@ -23,10 +23,14 @@ export default class map extends Phaser.Scene
 		this.load.spritesheet('enemigoMiniBoss', 'assets/sprites/miniBoss.png', { frameWidth: 47, frameHeight: 50 });
 		this.load.image('Isaac', 'assets/sprites/isaac.png');
 		this.load.spritesheet('isaacAnims', 'assets/sprites/isaacAnim.png', { frameWidth: 64, frameHeight: 64 });
+		this.load.image('bombas','assets/sprites/bombas.png');
+		this.load.image('llave','assets/sprites/llave.png');
 	}
 
 	create()
 	{
+		//this.objectManager = new objetos();
+
 		this.grupoEnemigos = new Array;
 		
 		this.eMiniBoss = new miniboss({ scene: this, x: 90, y: 190 }).setDepth(3).setSize(25, 25);
@@ -53,8 +57,9 @@ export default class map extends Phaser.Scene
 		enemy.forEach(obj => {
 			obj.setAlpha(0);
 			if (obj.name == 'fly') {
-				var f = new fly({ scene: this, x: obj.x, y: obj.y }).setDepth(3).setSize(12, 12)
+				var f = new fly({ scene: this, x: obj.x, y: obj.y }).setDepth(3).setSize(12, 12);
 				f.create();
+				f.name = "mosca";
 				this.grupoEnemigos.unshift(f);
 			}
 		})
@@ -94,11 +99,10 @@ export default class map extends Phaser.Scene
 		this.pIsaac.isaacInput();
 		this.pIsaac.update();
 
-		if (this.grupoEnemigos.destruir == false)
+		this.grupoEnemigos.forEach(obj =>
 		{
-			console.log(this.grupoEnemigos.destruir);
-			this.grupoEnemigos.forEach(obj => { obj.updateMoviemiento(this.pIsaac); })
-		}
+				obj.updateMoviemiento(this.pIsaac);
+		})
 
 		this.eMiniBoss.update();
 		this.pIsaac.actualizarLagrimas();

@@ -1,5 +1,6 @@
-import * as  map from './map.js';
-import * as  fly from './fly.js';
+import map from './map.js';
+import fly from './fly.js';
+import * as utilidades from './utilidades.js';
 //import teleport from './tp.js'
 
 export default class player extends Phaser.Physics.Arcade.Sprite
@@ -146,9 +147,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 		if (obj.vida <= 0)
 		{
-			obj.destruir = true;
-			obj.destroy();
-			console.log(obj.destruir);
+			obj.matar();
 		}
     }
 

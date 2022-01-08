@@ -1,4 +1,4 @@
-import * as  map from './map.js'
+import map from './map.js'
 
 export default class miniboss extends Phaser.Physics.Arcade.Sprite
 {

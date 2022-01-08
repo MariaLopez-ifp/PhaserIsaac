@@ -1,4 +1,4 @@
-import * as  map from './map.js'
+import map from './map.js'
 
 export var config = {
 
