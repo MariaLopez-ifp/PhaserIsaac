@@ -1,10 +1,13 @@
 import map from './map.js';
 import fly from './fly.js';
 import * as utilidades from './utilidades.js';
+import bomba from './objetos.js';
 //import teleport from './tp.js'
 
 export default class player extends Phaser.Physics.Arcade.Sprite
 {
+	grupoBombas = new Array;
+
 	constructor(config) {
 		super(config.scene, config.x, config.y, 'Isaac'); 
 		config.scene.add.existing(this);
@@ -17,6 +20,8 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 	create()
 	{
 		this.temp = 0;
+		this.tempBala = 0;
+		this.tempBomba = 0;
 
 		this.playerVelocidad = 125;
 
@@ -37,6 +42,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 		this.KeyW = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 		this.KeyS = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
 		this.Shot = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		this.Bomb = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
 	}
 
 	update()
@@ -47,29 +53,31 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 				{
 				key: 'isaacF',
 				frames: this.scene.anims.generateFrameNames('isaacAnims', { start: 0, end: 2 }),
-				frameRate: 4,
+				frameRate: 5,
 			});
 
 			this.scene.anims.create(
 				{
 				key: 'isaacL',
 				frames: this.scene.anims.generateFrameNames('isaacAnims', { start: 3, end: 5 }),
-				frameRate: 4,
+				frameRate: 5,
 			});
 
 			this.scene.anims.create(
 				{
 				key: 'isaacR',
 				frames: this.scene.anims.generateFrameNames('isaacAnims', { start: 6, end: 8 }),
-				frameRate: 4,
+				frameRate: 5,
 			});
 
 			this.scene.anims.create(
 				{
 				key: 'isaacB',
 				frames: this.scene.anims.generateFrameNames('isaacAnims', { start: 9, end: 11 }),
-				frameRate: 4,
+				frameRate: 5,
 			});
+
+			this.isaacInput();
 		}
 	}
 
@@ -108,6 +116,16 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 				this.vectorX = 0;
 			}
 
+			if (this.Bomb.isDown && this.bombas > 0 && this.tempBomba <= 0) {
+				var b = new bomba({scene : this.scene, x: this.x, y: this.y});
+				this.bombas--;
+				this.playerBombs.setText('Bombas: ' + this.bombas);
+				this.tempBomba = 20;
+				this.grupoBombas.push(b);
+			}
+
+			this.tempBomba--;
+
 			this.dir = new Phaser.Math.Vector2(this.vectorX, this.vectorY);
 			this.dir.normalize();
 			this.setVelocityX(this.playerVelocidad * this.dir.x);
@@ -121,18 +139,27 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 		this.scene.physics.add.overlap(this.dispLagrimas, obj, this.collisionBalas, null, this.scene);
 	}
 
+	quitarVida(dano)
+	{
+		if (this.vida > 0)
+		{
+			this.vida -= dano;
+		}
+
+		if (this.vida <= 0)
+		{
+			this.destroy();
+		}
+
+		this.playerHealth.setText('Vidas: ' + this.vida);
+	}
+
 	collisionPlayer(player, obj)
 	{
 		if (player.vida > 0 && player.temp <= 0)
 		{
-			player.vida--;
+			player.quitarVida(obj.ataque);
 			player.temp = 50;
-			player.playerHealth.setText('Vidas: ' + player.vida);
-		}
-
-		if (player.vida <= 0)
-		{
-			player.destroy();
 		}
 
 		player.temp--;
@@ -140,15 +167,8 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 	collisionBalas(obj, bala)
 	{
-		if (obj.vida > 0)
-		{
-			obj.vida--;
-		}
-
-		if (obj.vida <= 0)
-		{
-			obj.matar();
-		}
+		bala.destroy();
+		obj.quitarVida(bala.ataque);
     }
 
 	generarLagrimas()
@@ -156,6 +176,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 		if (this.vida > 0) {
 			var d = this.dispLagrimas.create(this.x, this.y, 'lagrimas').setDepth(8);
 			d.setScale(0.25, 0.25);
+			d.ataque = 1;
 
 			d.direccion = new Phaser.Math.Vector2(Math.cos(this.angulo * Math.PI / 180), Math.sin(this.angulo * Math.PI / 180));
 

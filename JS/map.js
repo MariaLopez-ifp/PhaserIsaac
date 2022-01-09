@@ -18,19 +18,20 @@ export default class map extends Phaser.Scene
 		this.load.image('doorTiles', 'assets/mapas/doors.png');
 		this.load.image('cuevaTiles', 'assets/mapas/cueva.png');
 		this.load.image('cellarTiles', 'assets/mapas/cellar.png');
-		this.load.tilemapTiledJSON('cuevaCellar', 'assets/mapas/mapa_Isac.json');
+		this.load.tilemapTiledJSON('cuevaCellar', 'assets/mapas/mapa_Isaac.json');
 		this.load.spritesheet('enemigoMosca', 'assets/sprites/fly.png', { frameWidth: 32, frameHeight: 32 });
 		this.load.spritesheet('enemigoMiniBoss', 'assets/sprites/miniBoss.png', { frameWidth: 47, frameHeight: 50 });
 		this.load.image('Isaac', 'assets/sprites/isaac.png');
 		this.load.spritesheet('isaacAnims', 'assets/sprites/isaacAnim.png', { frameWidth: 64, frameHeight: 64 });
 		this.load.image('bombas','assets/sprites/bombas.png');
 		this.load.image('llave','assets/sprites/llave.png');
+		this.load.spritesheet('explosionBomba', 'assets/sprites/explosion.png', { frameWidth: 100, frameHeight: 100 });
+
+		teleport.preload(this);
 	}
 
 	create()
 	{
-		//this.objectManager = new objetos();
-
 		this.grupoEnemigos = new Array;
 		
 		this.eMiniBoss = new miniboss({ scene: this, x: 90, y: 190 }).setDepth(3).setSize(25, 25);
@@ -54,6 +55,8 @@ export default class map extends Phaser.Scene
 		var enemy = mapa.createFromObjects('enemTiles');
 		var tilePortal = mapa.createFromObjects('tpTiles');
 
+		this.gates = teleport.create(tilePortal);
+
 		enemy.forEach(obj => {
 			obj.setAlpha(0);
 			if (obj.name == 'fly') {
@@ -64,7 +67,7 @@ export default class map extends Phaser.Scene
 			}
 		})
 
-		this.pIsaac = new isaac({ scene: this, x: 158, y: 90 }).setDepth(2).setSize(7, 27);
+		this.pIsaac = new isaac({ scene: this, x: 158, y: 90 }).setDepth(2).setSize(20, 28);
 
 		mapa.x = 0;
 		mapa.y = 0;
@@ -80,23 +83,27 @@ export default class map extends Phaser.Scene
 
 		paredes.setCollisionBetween(1, 1200);
 
-		const debugGraphics = this.add.graphics().setAlpha(0.7)
+		/*const debugGraphics = this.add.graphics().setAlpha(0.7)
 		paredes.renderDebug(debugGraphics, {
 			tileColor: null,
 			collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
 			faceColor: new Phaser.Display.Color(40, 39, 37, 255)
-		})
+		})*/
 
 		this.pIsaac.create();
 		this.pIsaac.crearCollision(this.grupoEnemigos);
 		this.grupoEnemigos.destruir = false;
-		//teleport.collisionPortal(this.pIsaac, this.scene);
-		//teleport.create(tilePortal);
+		
+		teleport.collisionPortal(this.pIsaac);
 	}
 
 	update()
 	{
-		this.pIsaac.isaacInput();
+		this.pIsaac.grupoBombas.forEach(obj =>
+		{
+				obj.update();
+		})
+
 		this.pIsaac.update();
 
 		this.grupoEnemigos.forEach(obj =>
@@ -107,14 +114,14 @@ export default class map extends Phaser.Scene
 		this.eMiniBoss.update();
 		this.pIsaac.actualizarLagrimas();
 		
-		if (this.pIsaac.Shot.isDown && this.pIsaac.temp <= 0)
+		if (this.pIsaac.Shot.isDown && this.pIsaac.tempBala <= 0)
 		{
 			this.pIsaac.generarLagrimas();
 
-			this.pIsaac.temp = 15;
+			this.pIsaac.tempBala = 15;
 		}
 
-		this.pIsaac.temp--;
+		this.pIsaac.tempBala--;
 	}
 
 	/*abrirPuerta()

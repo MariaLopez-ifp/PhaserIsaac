@@ -4,6 +4,8 @@ import * as objetos from './objetos.js';
 
 export default class fly extends Phaser.Physics.Arcade.Sprite
 {
+	ataque = 1;
+	
 	constructor(config) {
 		super(config.scene, config.x, config.y,'enemigoMosca');
 		config.scene.add.existing(this);
@@ -52,6 +54,19 @@ export default class fly extends Phaser.Physics.Arcade.Sprite
 			this.setVelocityX(movimiento.x);
 			this.setVelocityY(movimiento.y);
 		}		
+	}
+
+	quitarVida(dano)
+	{
+		if (this.vida > 0)
+		{
+			this.vida -= dano;
+		}
+
+		if (this.vida <= 0)
+		{
+			this.matar();
+		}
 	}
 
 	matar()

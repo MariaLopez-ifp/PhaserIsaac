@@ -1,13 +1,20 @@
 import * as utilidades from './utilidades.js';
 
 var portals = new Array();
-var coolDown = 120
-var tiempoActivo = 0;
+var scene;
 
-export function create(capa) {
+
+export function preload(s)
+{
+	scene = s;
+}
+
+export function create(capa)
+{
 	capa.forEach(obj => {
 
-		if (obj.name == 'portal') {
+		if(obj.name == 'portal')
+		{
 			scene.physics.world.enable(obj);
 
 			obj.setSize(4, 4)
@@ -28,58 +35,43 @@ export function create(capa) {
 	return portals
 }
 
-function createPortal(obj) {
+function createPortal(obj)
+{
 	utilidades.convertToProperties(obj)
 	obj.coolDown = 0
 
 	portals.unshift(obj)
 }
 
-export function collisionPortal(obj, s) {
-	//s.physics.add.overlap(obj, portals, teleport, teleportTimeout, s);
+export function collisionPortal(obj)
+{
+	scene.physics.add.overlap(obj, portals, teleport, null, scene);
 }
 
-function teleportTimeout() {
-	tiempoActivo++;
-
-	if (tiempoActivo > 20) {
-		tiempoActivo = 0
-		return true
-	}
-	return true
+function teleport(entity, obj)
+{
+	entity.x = obj.destino.x
+	entity.y = obj.destino.y + 30;
 }
 
-function teleport(entity, obj) {
-	if (obj.coolDown <= 0 && tiempoActivo == 10) {
-		obj.coolDown = coolDown
-		obj.destino.coolDown = coolDown
-
-		entity.x = obj.destino.x
-		entity.y = obj.destino.y
-		tiempoActivo = 0;
-	}
-}
-
-function createLinks() {
+function createLinks()
+{
 	for (var i = 0; i < portals.length; i++) {
 		var p = portals[i]
-
-		p.linked = false;
-		for (var e = 0; e < portals.length; e++) {
+		
+		p.linked=false;
+		for (var e = 0; e < portals.length; e++)
+		{
 			var d = portals[e]
-			if (p.properties.destino == d.properties.puerta) {
-				p.destino = d
-				p.linked = true;
+			if(p.properties.destino == d.properties.puerta)
+			{
+				p.destino=d
+				p.linked=true;
 			}
 		}
-		if (!p.linked) {
-			p.destino = p
+		if(!p.linked)
+		{
+			p.destino=p
 		}
-	}
-}
-
-export function update() {
-	for (var i = 0; i < portals.length; i++) {
-		portals[i].coolDown--
 	}
 }
