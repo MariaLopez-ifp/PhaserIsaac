@@ -158,6 +158,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 		if (this.vida <= 0)
 		{
+			this.end = this.scene.add.sprite(this.scene.game.config.width / 2, this.scene.game.config.height / 2, 'finJuego').setDepth(8).setScale(2).setScrollFactor(0);
 			this.destroy();
 			this.muerto = true;
 		}
@@ -185,7 +186,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 	generarLagrimas()
 	{
 		if (this.vida > 0) {
-			var d = this.dispLagrimas.create(this.x, this.y, 'lagrimas').setDepth(8);
+			var d = this.dispLagrimas.create(this.x, this.y, 'lagrimas').setDepth(5);
 			d.setScale(0.25, 0.25);
 			d.ataque = 1;
 			d.tiempoBala = 0;

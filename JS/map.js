@@ -32,6 +32,8 @@ export default class map extends Phaser.Scene
 		this.load.image('llave','assets/sprites/llave.png');
 		this.load.spritesheet('explosionBomba', 'assets/sprites/explosion.png', { frameWidth: 100, frameHeight: 100 });
 
+		this.load.image('finJuego', 'assets/sprites/fin.png');
+
 		teleport.preload(this);
 	}
 
@@ -39,7 +41,7 @@ export default class map extends Phaser.Scene
 	{
 		this.grupoEnemigos = new Array;
 		
-		this.eMiniBoss = new miniboss({ scene: this, x: 90, y: 190 }).setDepth(3).setSize(25, 25);
+		this.eMiniBoss = new miniboss({ scene: this, x: 90, y: 190 }).setDepth(5).setSize(25, 25);
 		this.eMiniBoss.name = "miniBoss";
 
 		this.cerraduraCueva = this.physics.add.sprite(159, -96, 'cerraduraTile').setDepth(2);
@@ -65,7 +67,7 @@ export default class map extends Phaser.Scene
 		enemy.forEach(obj => {
 			obj.setAlpha(0);
 			if (obj.name == 'fly') {
-				var f = new fly({ scene: this, x: obj.x, y: obj.y }).setDepth(3).setSize(12, 12);
+				var f = new fly({ scene: this, x: obj.x, y: obj.y }).setDepth(5).setSize(12, 12);
 				f.create();
 				f.name = "mosca";
 				this.grupoEnemigos.unshift(f);
@@ -130,17 +132,15 @@ export default class map extends Phaser.Scene
 
 	abrirPuerta()
 	{
-		if (this.pIsaac.llaves > 0)
+		this.cerraduraCueva.detectionbox = this.add.rectangle(this.cerraduraCueva.x, this.cerraduraCueva.y, 100, 100);
+
+		if (this.pIsaac.llaves = 1)
 		{
+			this.physics.add.existing(this.cerraduraCueva.detectionbox, false);
 			this.cerraduraCueva.body.enable = false;
 			this.cerraduraCueva.detectionbox.body.enable = false;
 			this.cerraduraCueva.setAlpha(0);
-		}
-
-		if (this.pIsaac.llaves = 0)
-		{
-			this.cerraduraCueva.detectionbox = this.add.rectangle(this.cerraduraCueva.x, this.cerraduraCueva.y, 100, 100);
-			this.physics.add.existing(this.cerraduraCueva.detectionbox, false);
+			this.pIsaac.llaves--;
 		}
 	}
 }
