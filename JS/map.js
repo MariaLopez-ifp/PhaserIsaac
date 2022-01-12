@@ -12,17 +12,22 @@ export default class map extends Phaser.Scene
 		super('mapa');
 	}
 
-	preload() {
-		this.load.image('lagrimas', 'assets/sprites/lagrima.png');
-		this.load.image('lagrimasEnemigo', 'assets/sprites/lagrimaSangre.png');
+	preload() 
+	{
 		this.load.image('doorTiles', 'assets/mapas/doors.png');
 		this.load.image('cuevaTiles', 'assets/mapas/cueva.png');
 		this.load.image('cellarTiles', 'assets/mapas/cellar.png');
+		this.load.image('cerraduraTile', 'assets/mapas/cerradura.png');
 		this.load.tilemapTiledJSON('cuevaCellar', 'assets/mapas/mapa_Isaac.json');
+
+		this.load.image('lagrimas', 'assets/sprites/lagrima.png');
+		this.load.image('lagrimasEnemigo', 'assets/sprites/lagrimaSangre.png');
+		
+		this.load.image('Isaac', 'assets/sprites/isaac.png');
 		this.load.spritesheet('enemigoMosca', 'assets/sprites/fly.png', { frameWidth: 32, frameHeight: 32 });
 		this.load.spritesheet('enemigoMiniBoss', 'assets/sprites/miniBoss.png', { frameWidth: 47, frameHeight: 50 });
-		this.load.image('Isaac', 'assets/sprites/isaac.png');
 		this.load.spritesheet('isaacAnims', 'assets/sprites/isaacAnim.png', { frameWidth: 64, frameHeight: 64 });
+
 		this.load.image('bombas','assets/sprites/bombas.png');
 		this.load.image('llave','assets/sprites/llave.png');
 		this.load.spritesheet('explosionBomba', 'assets/sprites/explosion.png', { frameWidth: 100, frameHeight: 100 });
@@ -35,8 +40,9 @@ export default class map extends Phaser.Scene
 		this.grupoEnemigos = new Array;
 		
 		this.eMiniBoss = new miniboss({ scene: this, x: 90, y: 190 }).setDepth(3).setSize(25, 25);
-		
-		this.contLagrimas = 0;
+		this.eMiniBoss.name = "miniBoss";
+
+		this.cerraduraCueva = this.physics.add.sprite(159, -96, 'cerraduraTile').setDepth(2);
 
 		const mapa = this.make.tilemap({ key: 'cuevaCellar' });
 
@@ -46,8 +52,7 @@ export default class map extends Phaser.Scene
 
 		var roomTiles = [tileset2, tileset3];
 
-		const cerradura = mapa.createLayer('Cerradura', tileset).setDepth(2);
-		const doors = mapa.createLayer('Doors', tileset).setDepth(1);
+		const doors = mapa.createLayer('Doors', tileset).setDepth(3);
 		const backDoor = mapa.createLayer('BackDoor', tileset).setDepth(1);
 		const paredes = mapa.createLayer('Paredes', roomTiles).setDepth(0);
 		const suelo = mapa.createLayer('Suelo', roomTiles).setDepth(0);
@@ -67,18 +72,20 @@ export default class map extends Phaser.Scene
 			}
 		})
 
-		this.pIsaac = new isaac({ scene: this, x: 158, y: 90 }).setDepth(2).setSize(20, 28);
+		this.pIsaac = new isaac({ scene: this, x: 158, y: 90 }).setDepth(4).setSize(20, 28);
 
 		mapa.x = 0;
 		mapa.y = 0;
 
-		var allTiles = [doors, backDoor, paredes, suelo, cerradura];
+		var allTiles = [doors, backDoor, paredes, suelo];
 
 		this.cameras.main.startFollow(this.pIsaac);
 
 		this.camara = this.cameras.main;
 
 		this.physics.add.collider(this.pIsaac, allTiles);
+		this.physics.add.collider(this.grupoEnemigos, allTiles);
+		this.physics.add.collider(this.eMiniBoss, allTiles);
 		this.physics.add.collider(this.grupoEnemigos, this.grupoEnemigos);
 
 		paredes.setCollisionBetween(1, 1200);
@@ -91,8 +98,13 @@ export default class map extends Phaser.Scene
 		})*/
 
 		this.pIsaac.create();
+		this.eMiniBoss.create();
 		this.pIsaac.crearCollision(this.grupoEnemigos);
+		this.pIsaac.crearCollision(this.eMiniBoss);
+		this.eMiniBoss.crearCollision(this.pIsaac);
 		this.grupoEnemigos.destruir = false;
+		this.eMiniBoss.destruir = false;
+		this.abrirPuerta();
 		
 		teleport.collisionPortal(this.pIsaac);
 	}
@@ -111,29 +123,24 @@ export default class map extends Phaser.Scene
 				obj.updateMoviemiento(this.pIsaac);
 		})
 
+		this.eMiniBoss.updateMoviemiento(this.pIsaac);
 		this.eMiniBoss.update();
 		this.pIsaac.actualizarLagrimas();
-		
-		if (this.pIsaac.Shot.isDown && this.pIsaac.tempBala <= 0)
-		{
-			this.pIsaac.generarLagrimas();
-
-			this.pIsaac.tempBala = 15;
-		}
-
-		this.pIsaac.tempBala--;
 	}
 
-	/*abrirPuerta()
+	abrirPuerta()
 	{
-		if (keyOn)
+		if (this.pIsaac.llaves > 0)
 		{
-			cerradura.detectionbox = scene.add.rectangle(mago.x, mago.y, 180, 180);
-			scene.physics.add.existing(cerradura.detectionbox, false);
-
-			cerradura.body.enable = false;
-			cerradura.detectionbox.body.enable = false;
-			cerradura.setAlpha(0);
+			this.cerraduraCueva.body.enable = false;
+			this.cerraduraCueva.detectionbox.body.enable = false;
+			this.cerraduraCueva.setAlpha(0);
 		}
-	}*/
+
+		if (this.pIsaac.llaves = 0)
+		{
+			this.cerraduraCueva.detectionbox = this.add.rectangle(this.cerraduraCueva.x, this.cerraduraCueva.y, 100, 100);
+			this.physics.add.existing(this.cerraduraCueva.detectionbox, false);
+		}
+	}
 }

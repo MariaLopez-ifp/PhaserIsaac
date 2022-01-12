@@ -8,6 +8,7 @@ export function dropearObj(enem)
 	if(enem.name == "miniBoss" && enem.name != null)
 	{
 		var l = new llave({scene : enem.scene, x: enem.x, y: enem.y});
+		l.createCollision();
 	}
 
 	if(enem.name == "mosca" && enem.name != null && aleatorio == 1)
@@ -30,7 +31,6 @@ export default class bomba extends Phaser.Physics.Arcade.Sprite
 		this.x = config.x;
 		this.y = config.y;
 		this.muerto = false;
-		//this.createAnims();
 	}
 
 	update()
@@ -64,7 +64,6 @@ export default class bomba extends Phaser.Physics.Arcade.Sprite
 
 				if(distancia <= 80 && !this.scene.grupoEnemigos[i].muerto)
 				{
-					
 					this.scene.grupoEnemigos[i].quitarVida(this.ataque);
 				}
 			}
@@ -74,6 +73,13 @@ export default class bomba extends Phaser.Physics.Arcade.Sprite
 			if(distancia <= 80)
 			{
 				this.scene.pIsaac.quitarVida(this.ataque);
+			}
+
+			var distancia = Phaser.Math.Distance.BetweenPoints(this, this.scene.eMiniBoss);
+
+			if(distancia <= 80 && !this.scene.eMiniBoss.muerto)
+			{
+				this.scene.eMiniBoss.quitarVida(this.ataque);
 			}
 
 			new efectos({scene : this.scene, x: this.x, y: this.y, effectAnim: 'explosionB'});
@@ -97,6 +103,11 @@ class llave extends Phaser.Physics.Arcade.Sprite
 		this.scene = config.scene;
 		this.x = config.x;
 		this.y = config.y;
+	}
+
+	createCollision()
+	{
+		this.scene.physics.add.overlap(this, this.scene.pIsaac, this.recoger, null, this.scene);
 	}
 
 	recoger(obj, pj)

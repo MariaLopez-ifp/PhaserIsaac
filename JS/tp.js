@@ -1,4 +1,6 @@
 import * as utilidades from './utilidades.js';
+import isaac from './isaac.js';
+
 
 var portals = new Array();
 var scene;
@@ -51,7 +53,9 @@ export function collisionPortal(obj)
 function teleport(entity, obj)
 {
 	entity.x = obj.destino.x
-	entity.y = obj.destino.y + 30;
+	entity.y = obj.destino.y + 35;
+	entity.play('isaacF', true);
+	entity.angulo = 90;
 }
 
 function createLinks()
