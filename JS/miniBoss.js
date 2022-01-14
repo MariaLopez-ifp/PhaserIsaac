@@ -9,6 +9,7 @@ export default class miniboss extends enemigos
 
 	constructor(config) {
 		super(config, 'enemigoMiniBoss');
+		this.rotationSpeed = 0.1;
 	}
 
 

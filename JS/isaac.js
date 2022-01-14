@@ -39,6 +39,8 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 		this.dispLagrimas = this.scene.physics.add.group();
 
+		this.cerraduraCueva = this.scene.physics.add.staticSprite(159, -96, 'cerraduraTile').setDepth(2).setSize(40, 27);
+
 		this.KeyA = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 		this.KeyD = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 		this.KeyW = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
@@ -145,8 +147,12 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 	crearCollision(obj)
 	{
+		this.scene.physics.add.overlap(this, this.cerraduraCueva, this.abrirPuerta, null, this);
+		this.scene.physics.add.overlap(this, this.cerraduraCueva, this.crearBoss, null, this);
 		this.scene.physics.add.overlap(this, obj, this.collisionPlayer, null, this.scene);
 		this.scene.physics.add.overlap(this.dispLagrimas, obj, this.collisionBalas, null, this.scene);
+		this.scene.physics.add.collider(this, this.cerraduraCueva);
+		this.scene.physics.add.collider(this, this.cerraduraCueva);
 	}
 
 	quitarVida(dano)
@@ -158,7 +164,7 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 
 		if (this.vida <= 0)
 		{
-			this.end = this.scene.add.sprite(this.scene.game.config.width / 2, this.scene.game.config.height / 2, 'finJuego').setDepth(8).setScale(2).setScrollFactor(0);
+			this.end = this.scene.add.sprite(this.scene.game.config.width / 2, this.scene.game.config.height / 2, 'finJuego').setDepth(15).setScale(2).setScrollFactor(0);
 			this.destroy();
 			this.muerto = true;
 		}
@@ -213,6 +219,20 @@ export default class player extends Phaser.Physics.Arcade.Sprite
 			{
 				l.destroy();
 			}
+		}
+	}
+
+	abrirPuerta()
+	{
+		if(this.llaves == 1)
+		{
+			this.cerraduraCueva
+			this.scene.physics.add.existing(this.cerraduraCueva, false);
+
+			this.cerraduraCueva.body.enable = false;
+			this.cerraduraCueva.setAlpha(0);
+
+			this.llaves--;
 		}
 	}
 }

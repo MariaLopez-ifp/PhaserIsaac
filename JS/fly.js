@@ -9,6 +9,7 @@ export default class fly extends enemigos
 	
 	constructor(config) {
 		super(config, 'enemigoMosca');
+		this.rotationSpeed = 0.1;
 	}
 
 	create()
@@ -16,7 +17,7 @@ export default class fly extends enemigos
 		this.muerto = false;
 		this.maxVida = 1;
 		this.vida = this.maxVida;
-		this.velocidad = 45;
+		this.velocidad = 60;
 		this.createAnims();
 	}
 
